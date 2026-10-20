@@ -2,7 +2,7 @@
   "name": "tei-scholar",
   "displayName": "TEI Scholar",
   "description": "TEI editing for Indological texts: TEI P5 validation and pop-up documentation, Devanagari/IAST font profiles and transliteration, and word-processor-style footnotes stored in <standOff>.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "publisher": "tei-scholar",
   "license": "MIT",
   "engines": {
@@ -94,6 +94,21 @@
         "command": "teiScholar.velthuisToIast",
         "title": "Convert Selection: Velthuis → IAST",
         "category": "TEI"
+      },
+      {
+        "command": "teiScholar.toggleAnchorNote",
+        "title": "Jump Between Footnote Anchor and Note",
+        "category": "TEI"
+      },
+      {
+        "command": "teiScholar.gotoNote",
+        "title": "Go to Note of Footnote at Cursor",
+        "category": "TEI"
+      },
+      {
+        "command": "teiScholar.gotoAnchor",
+        "title": "Go Back to Footnote Anchor in Text",
+        "category": "TEI"
       }
     ],
     "keybindings": [
@@ -136,6 +151,12 @@
         "command": "teiScholar.deleteAnchorRight",
         "key": "delete",
         "when": "editorTextFocus && !editorReadonly && editorLangId == xml && teiScholar.atAnchorStart && !editorHasSelection && !editorHasMultipleSelections && !suggestWidgetVisible"
+      },
+      {
+        "command": "teiScholar.toggleAnchorNote",
+        "key": "ctrl+alt+j",
+        "mac": "cmd+alt+j",
+        "when": "editorTextFocus && editorLangId == xml"
       }
     ],
     "menus": {
@@ -153,6 +174,10 @@
         },
         {
           "command": "teiScholar.editFootnote",
+          "group": "1_notes@2"
+        },
+        {
+          "command": "teiScholar.toggleAnchorNote",
           "group": "1_notes@2"
         },
         {
@@ -190,6 +215,16 @@
         {
           "command": "teiScholar.chooseFont",
           "group": "4_view@1"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "teiScholar.gotoNote",
+          "when": "editorLangId == xml"
+        },
+        {
+          "command": "teiScholar.gotoAnchor",
+          "when": "editorLangId == xml"
         }
       ]
     },
@@ -284,6 +319,11 @@
           "type": "boolean",
           "default": true,
           "markdownDescription": "Treat an `<anchor/>` like a footnote mark: Backspace just after it, or Delete just before it, removes the whole anchor and its note in one step."
+        },
+        "teiScholar.footnotes.backLinks": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Show *↑ back to text* and *edit in pane* links above each footnote `<note>` in the standOff area."
         },
         "teiScholar.footnotes.showNumbers": {
           "type": "boolean",

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { parse, Parsed, whereAt, ancestors, localName, attr, isTeiDocument, Elem } from './xmlscan';
+import { parse, Parsed, whereAt, ancestors, localName, attr, isTeiDocument, Elem, elementAt as elementAtOffset } from './xmlscan';
 import * as F from './footnotes';
 import { TeiHelp, HelpData, refUrl } from './help';
 import { FootnoteViewProvider, NoteState } from './footnoteView';
@@ -288,10 +288,18 @@ export function activate(ctx: vscode.ExtensionContext) {
       const maxList = cfg().get<number>('help.maxListLength', 30);
       let md: string | undefined;
       let range: vscode.Range | undefined;
-      if (w.kind === 'elementName') {
+      const onAnchor = 'el' in w && w.el && localName(w.el.name) === 'anchor' && w.kind !== 'content' ? w.el : undefined;
+      const inNote = !onAnchor ? noteAround(p, off) : undefined;
+      if (onAnchor) {
+        md = noteHover(doc, p, onAnchor);
+        const more = help.elementMarkdown('anchor', { maxList: 0 });
+        if (md && more && w.kind === 'elementName') md += '\n\n---\n\n' + more;
+      } else if (inNote && cfg().get<boolean>('help.hoverOnText', true) && w.kind === 'content') {
+        md = backHover(doc, inNote.anchorId);
+      } else if (w.kind === 'elementName') {
         const ln = localName(w.el.name);
         md = help.elementMarkdown(ln, { maxList });
-        if (ln === 'anchor') md = (noteHover(doc, p, w.el) ?? '') + (md ? '\n\n---\n\n' + md : '');
+        if (inNote && ln === 'note') md = backHover(doc, inNote.anchorId) + (md ? '\n\n---\n\n' + md : '');
       } else if (w.kind === 'attrName' || w.kind === 'attrValue') {
         const ln = localName(w.el.name);
         md = help.attributeMarkdown(ln, w.attr.name, w.attr.value);
@@ -300,28 +308,121 @@ export function activate(ctx: vscode.ExtensionContext) {
           if (ref) md = `→ \`<${ref.name}${attr(ref, 'n') ? ` n="${attr(ref, 'n')}"` : ''}>\`: ${snippet(doc.getText(), ref)}\n\n---\n\n` + (md ?? '');
         }
         range = new vscode.Range(doc.positionAt(w.attr.nameStart), doc.positionAt(w.attr.valueEnd + 1));
-      } else if (w.kind === 'inTag' && localName(w.el.name) === 'anchor') {
-        md = noteHover(doc, p, w.el);
       } else if (w.kind === 'content' && w.el && cfg().get<boolean>('help.hoverOnText', true)) {
         const path = ancestors(w.el).reverse().map(e => localName(e.name));
         md = help.pathMarkdown(path);
       }
       if (!md) return;
       const m = new vscode.MarkdownString(md);
-      m.isTrusted = false;
+      // only our own footnote commands may be run from hover links
+      m.isTrusted = { enabledCommands: ['teiScholar.editFootnoteById', 'teiScholar.gotoNote', 'teiScholar.gotoAnchor'] };
+      m.supportThemeIcons = true;
       return new vscode.Hover(m, range);
     },
   }));
 
+  const link = (title: string, command: string, args: unknown[], tip: string) =>
+    `[${title}](command:${command}?${encodeURIComponent(JSON.stringify(args))} "${tip}")`;
+
   function noteHover(doc: vscode.TextDocument, p: Parsed, anchor: Elem): string | undefined {
     const id = attr(anchor, 'xml:id');
     if (!id) return;
+    const uri = doc.uri.toString();
     const note = F.noteFor(p, id);
-    if (!note) return `**Footnote ${id}** — *no note yet* (run **TEI: Edit Footnote**)`;
+    const edit = link('$(edit) Edit', 'teiScholar.editFootnoteById', [uri, id], 'Edit this note in the Footnote pane (Ctrl+Alt+E)');
+    if (!note) return `**Footnote ${id}** — *no note yet*\n\n${edit}`;
     const body = F.noteContent(doc.getText(), note).replace(/\s+/g, ' ').trim();
     const t = F.noteType(note);
-    return `**Footnote ${id}**${t ? ` · *${t}*` : ''}\n\n${escapeMd(body)}`;
+    const go = link('$(arrow-down) Go to note', 'teiScholar.gotoNote', [uri, id], 'Jump to the <note> in the standOff (Ctrl+Alt+J); Ctrl+Alt+J again brings you back');
+    return `**Footnote ${id}**${t ? ` · *${t}*` : ''}\n\n${escapeMd(body)}\n\n${edit} &nbsp;&nbsp; ${go}`;
   }
+
+  function backHover(doc: vscode.TextDocument, anchorId: string): string {
+    const uri = doc.uri.toString();
+    const back = link('$(arrow-up) Back to text', 'teiScholar.gotoAnchor', [uri, anchorId], 'Return to the anchor in the text (Ctrl+Alt+J)');
+    const edit = link('$(edit) Edit in pane', 'teiScholar.editFootnoteById', [uri, anchorId], 'Edit this note in the Footnote pane');
+    return `**Note for ${anchorId}**\n\n${back} &nbsp;&nbsp; ${edit}`;
+  }
+
+  /** The note (in a standOff or elsewhere) that contains this offset. */
+  function noteAround(p: Parsed, off: number): { note: Elem; anchorId: string } | undefined {
+    for (let e = elementAtOffset(p, off); e; e = e.parent) {
+      if (localName(e.name) !== 'note') continue;
+      const t = (attr(e, 'target') || '').split(/\s+/)[0].replace(/^#/, '');
+      if (t && p.ids.get(t)?.some(x => localName(x.name) === 'anchor')) return { note: e, anchorId: t };
+    }
+    return undefined;
+  }
+
+  // ----- jumping between anchor and note -----
+  async function reveal(doc: vscode.TextDocument, offset: number) {
+    const ed = await vscode.window.showTextDocument(doc, { preserveFocus: false });
+    const pos = doc.positionAt(offset);
+    ed.selection = new vscode.Selection(pos, pos);
+    ed.revealRange(new vscode.Range(pos, pos), vscode.TextEditorRevealType.InCenterIfOutsideViewport);
+  }
+  const docFor = async (uri?: string) => uri ? (findDoc(uri) ?? await vscode.workspace.openTextDocument(vscode.Uri.parse(uri))) : vscode.window.activeTextEditor?.document;
+
+  cmd('teiScholar.gotoNote', async (uri?: string, id?: string) => {
+    const doc = await docFor(uri);
+    if (!doc) return;
+    const p = parsedOf(doc);
+    if (!id) {
+      const a = F.anchorAt(p, doc.offsetAt(vscode.window.activeTextEditor!.selection.active));
+      id = a ? attr(a, 'xml:id') : undefined;
+    }
+    const note = id ? F.noteFor(p, id) : undefined;
+    if (!note) { vscode.window.showInformationMessage(id ? `Footnote ${id} has no note yet.` : 'Put the cursor on a footnote anchor.'); return; }
+    await reveal(doc, note.startTagEnd);
+  });
+
+  cmd('teiScholar.gotoAnchor', async (uri?: string, id?: string) => {
+    const doc = await docFor(uri);
+    if (!doc) return;
+    const p = parsedOf(doc);
+    if (!id) id = noteAround(p, doc.offsetAt(vscode.window.activeTextEditor!.selection.active))?.anchorId;
+    const a = id ? p.ids.get(id)?.find(x => localName(x.name) === 'anchor') : undefined;
+    if (!a) { vscode.window.showInformationMessage('Put the cursor inside a footnote <note>.'); return; }
+    await reveal(doc, a.end); // cursor just after the anchor, ready to carry on typing
+  });
+
+  // one key for both directions
+  cmd('teiScholar.toggleAnchorNote', async () => {
+    const ed = vscode.window.activeTextEditor;
+    if (!ed) return;
+    const p = parsedOf(ed.document);
+    const off = ed.document.offsetAt(ed.selection.active);
+    if (noteAround(p, off)) return vscode.commands.executeCommand('teiScholar.gotoAnchor');
+    if (F.anchorAt(p, off)) return vscode.commands.executeCommand('teiScholar.gotoNote');
+    vscode.window.showInformationMessage('Put the cursor on a footnote anchor or inside its note.');
+  });
+
+  cmd('teiScholar.editFootnoteById', async (uri?: string, id?: string) => {
+    const doc = await docFor(uri);
+    if (!doc || !id) return;
+    const a = parsedOf(doc).ids.get(id)?.find(x => localName(x.name) === 'anchor');
+    if (a) await openNote(doc, a, true);
+  });
+
+  // "↑ back to text" above every footnote note in the standOff area
+  ctx.subscriptions.push(vscode.languages.registerCodeLensProvider({ language: 'xml' }, {
+    provideCodeLenses(doc) {
+      if (!cfg().get<boolean>('footnotes.backLinks', true) || !isTei(doc)) return [];
+      const p = parsedOf(doc);
+      const lenses: vscode.CodeLens[] = [];
+      for (const el of p.all) {
+        if (localName(el.name) !== 'note' || !el.parent || localName(el.parent.name) !== 'standOff') continue;
+        const id = (attr(el, 'target') || '').split(/\s+/)[0].replace(/^#/, '');
+        const a = p.ids.get(id)?.find(x => localName(x.name) === 'anchor');
+        if (!a) continue;
+        const r = new vscode.Range(doc.positionAt(el.start), doc.positionAt(el.start));
+        const line = doc.positionAt(a.start).line + 1;
+        lenses.push(new vscode.CodeLens(r, { title: `↑ back to text (line ${line})`, command: 'teiScholar.gotoAnchor', arguments: [doc.uri.toString(), id] }));
+        lenses.push(new vscode.CodeLens(r, { title: 'edit in pane', command: 'teiScholar.editFootnoteById', arguments: [doc.uri.toString(), id] }));
+      }
+      return lenses;
+    },
+  }));
 
   // ----- go to definition for #pointers and anchors -----
   ctx.subscriptions.push(vscode.languages.registerDefinitionProvider({ language: 'xml' }, {
