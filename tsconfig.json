@@ -1,0 +1,2 @@
+{ "compilerOptions": { "target": "ES2022", "module": "commonjs", "strict": true, "esModuleInterop": true, "skipLibCheck": true, "lib": ["ES2022"], "types": ["node", "vscode"], "noEmit": true },
+  "include": ["src", "test"] }

@@ -1,0 +1,400 @@
+{
+  "name": "tei-scholar",
+  "displayName": "TEI Scholar",
+  "description": "TEI editing for Indological texts: TEI P5 validation and pop-up documentation, Devanagari/IAST font profiles and transliteration, and word-processor-style footnotes stored in <standOff>.",
+  "version": "0.3.0",
+  "publisher": "tei-scholar",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Other"
+  ],
+  "keywords": [
+    "TEI",
+    "XML",
+    "Sanskrit",
+    "Devanagari",
+    "IAST",
+    "digital humanities"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onLanguage:xml"
+  ],
+  "extensionDependencies": [
+    "redhat.vscode-xml"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "teiScholar.insertFootnote",
+        "title": "Insert Footnote",
+        "category": "TEI"
+      },
+      {
+        "command": "teiScholar.editFootnote",
+        "title": "Edit Footnote",
+        "category": "TEI"
+      },
+      {
+        "command": "teiScholar.deleteFootnote",
+        "title": "Delete Footnote",
+        "category": "TEI"
+      },
+      {
+        "command": "teiScholar.renumberFootnotes",
+        "title": "Renumber Footnotes in Reading Order",
+        "category": "TEI"
+      },
+      {
+        "command": "teiScholar.nextFootnote",
+        "title": "Next Footnote",
+        "category": "TEI"
+      },
+      {
+        "command": "teiScholar.previousFootnote",
+        "title": "Previous Footnote",
+        "category": "TEI"
+      },
+      {
+        "command": "teiScholar.openDocs",
+        "title": "Open TEI Documentation for Element at Cursor",
+        "category": "TEI"
+      },
+      {
+        "command": "teiScholar.addSchema",
+        "title": "Add tei_all Schema Declaration",
+        "category": "TEI"
+      },
+      {
+        "command": "teiScholar.chooseFont",
+        "title": "Choose Font Profile",
+        "category": "TEI"
+      },
+      {
+        "command": "teiScholar.iastToDevanagari",
+        "title": "Convert Selection: IAST → Devanagari",
+        "category": "TEI"
+      },
+      {
+        "command": "teiScholar.devanagariToIast",
+        "title": "Convert Selection: Devanagari → IAST",
+        "category": "TEI"
+      },
+      {
+        "command": "teiScholar.hkToIast",
+        "title": "Convert Selection: Harvard-Kyoto → IAST",
+        "category": "TEI"
+      },
+      {
+        "command": "teiScholar.velthuisToIast",
+        "title": "Convert Selection: Velthuis → IAST",
+        "category": "TEI"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "teiScholar.insertFootnote",
+        "key": "ctrl+alt+n",
+        "mac": "cmd+alt+n",
+        "when": "editorTextFocus && editorLangId == xml"
+      },
+      {
+        "command": "teiScholar.editFootnote",
+        "key": "ctrl+alt+e",
+        "mac": "cmd+alt+e",
+        "when": "editorTextFocus && editorLangId == xml"
+      },
+      {
+        "command": "teiScholar.nextFootnote",
+        "key": "ctrl+alt+down",
+        "mac": "cmd+alt+down",
+        "when": "editorTextFocus && editorLangId == xml"
+      },
+      {
+        "command": "teiScholar.previousFootnote",
+        "key": "ctrl+alt+up",
+        "mac": "cmd+alt+up",
+        "when": "editorTextFocus && editorLangId == xml"
+      },
+      {
+        "command": "teiScholar.openDocs",
+        "key": "ctrl+f1",
+        "mac": "cmd+f1",
+        "when": "editorTextFocus && editorLangId == xml"
+      },
+      {
+        "command": "teiScholar.deleteAnchorLeft",
+        "key": "backspace",
+        "when": "editorTextFocus && !editorReadonly && editorLangId == xml && teiScholar.atAnchorEnd && !editorHasSelection && !editorHasMultipleSelections && !suggestWidgetVisible"
+      },
+      {
+        "command": "teiScholar.deleteAnchorRight",
+        "key": "delete",
+        "when": "editorTextFocus && !editorReadonly && editorLangId == xml && teiScholar.atAnchorStart && !editorHasSelection && !editorHasMultipleSelections && !suggestWidgetVisible"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "submenu": "teiScholar.menu",
+          "when": "editorLangId == xml",
+          "group": "1_tei"
+        }
+      ],
+      "teiScholar.menu": [
+        {
+          "command": "teiScholar.insertFootnote",
+          "group": "1_notes@1"
+        },
+        {
+          "command": "teiScholar.editFootnote",
+          "group": "1_notes@2"
+        },
+        {
+          "command": "teiScholar.deleteFootnote",
+          "group": "1_notes@3"
+        },
+        {
+          "command": "teiScholar.renumberFootnotes",
+          "group": "1_notes@4"
+        },
+        {
+          "command": "teiScholar.openDocs",
+          "group": "2_help@1"
+        },
+        {
+          "command": "teiScholar.iastToDevanagari",
+          "group": "3_translit@1",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "teiScholar.devanagariToIast",
+          "group": "3_translit@2",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "teiScholar.hkToIast",
+          "group": "3_translit@3",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "teiScholar.velthuisToIast",
+          "group": "3_translit@4",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "teiScholar.chooseFont",
+          "group": "4_view@1"
+        }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "teiScholar.menu",
+        "label": "TEI"
+      }
+    ],
+    "viewsContainers": {
+      "panel": [
+        {
+          "id": "teiScholarPanel",
+          "title": "Footnote",
+          "icon": "$(note)"
+        }
+      ]
+    },
+    "views": {
+      "teiScholarPanel": [
+        {
+          "type": "webview",
+          "id": "teiScholar.footnoteView",
+          "name": "Footnote"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "TEI Scholar",
+      "properties": {
+        "teiScholar.footnotes.noteLang": {
+          "type": "string",
+          "default": "en",
+          "description": "Value of xml:lang on new <note> elements."
+        },
+        "teiScholar.footnotes.standOffTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "Notes",
+            "Emendation",
+            "Testimonia"
+          ],
+          "markdownDescription": "Choices for the `@type` of a note's `<standOff>`, offered in the Footnote pane (which also offers **Custom…**). Each type gets its own `<standOff>` per passage; within a passage they are written in this order. The first one is the default."
+        },
+        "teiScholar.footnotes.contextElements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "markdownDescription": "Which enclosing elements supply the `XXX` in `XXX-n1`. Empty = the nearest enclosing element that has an `xml:id`. Example: `[\"lg\", \"p\"]` to always use the line group even when an `<l>` has its own id."
+        },
+        "teiScholar.footnotes.indent": {
+          "type": "string",
+          "default": "",
+          "description": "Indentation unit for new <standOff>/<note> lines. Empty = use the editor's tab settings."
+        },
+        "teiScholar.footnotes.fontFamily": {
+          "type": "string",
+          "default": "",
+          "description": "Font for the footnote pane. Empty = same as the XML editor font."
+        },
+        "teiScholar.footnotes.fontSize": {
+          "type": "number",
+          "default": 0,
+          "description": "Font size for the footnote pane. 0 = same as the XML editor."
+        },
+        "teiScholar.footnotes.foreignLang": {
+          "type": "string",
+          "default": "sa-Latn",
+          "description": "xml:lang used by the 'foreign' button in the footnote pane."
+        },
+        "teiScholar.footnotes.followCursor": {
+          "type": "boolean",
+          "default": true,
+          "description": "When the footnote pane is open, show the note of whichever anchor the cursor is on."
+        },
+        "teiScholar.footnotes.revealOnAnchor": {
+          "type": "boolean",
+          "default": false,
+          "description": "Open the footnote pane automatically when the cursor lands on a footnote anchor."
+        },
+        "teiScholar.footnotes.deleteNoteWithAnchor": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "When a footnote `<anchor/>` is deleted from the text, delete its `<note>` too (and its `<standOff>` if it becomes empty). If the anchor was cut and is pasted back in the same file, the note is restored."
+        },
+        "teiScholar.footnotes.atomicAnchors": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Treat an `<anchor/>` like a footnote mark: Backspace just after it, or Delete just before it, removes the whole anchor and its note in one step."
+        },
+        "teiScholar.footnotes.showNumbers": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show running footnote numbers (¹ ² ³) after anchors in the editor. Display only; nothing is written to the file."
+        },
+        "teiScholar.help.hoverOnText": {
+          "type": "boolean",
+          "default": true,
+          "description": "Hovering over text shows the element path (e.g. TEI › text › body › div › lg › l) with links to the TEI Guidelines."
+        },
+        "teiScholar.help.maxListLength": {
+          "type": "number",
+          "default": 30,
+          "description": "Maximum number of elements listed under 'May contain' / 'Contained by' in hovers."
+        },
+        "teiScholar.schema.useBundledSchema": {
+          "type": "boolean",
+          "default": true,
+          "description": "Register a catalog with Red Hat XML so the standard tei_all.rng URL resolves to the bundled copy (offline, faster)."
+        },
+        "teiScholar.schema.offerAssociation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Offer to add a tei_all schema declaration to TEI files that have none."
+        },
+        "teiScholar.translit.avagraha": {
+          "type": "string",
+          "default": "'",
+          "description": "Character written for avagraha (ऽ) when converting Devanagari to IAST, e.g. ' or ’."
+        },
+        "teiScholar.fontProfiles": {
+          "type": "array",
+          "markdownDescription": "Font profiles offered by **TEI: Choose Font Profile**. `fontFamily` is a CSS list: characters missing from the first font fall back to the next, so put a Latin/IAST font first and a Devanagari font after it.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "fontFamily": {
+                "type": "string"
+              },
+              "fontSize": {
+                "type": "number"
+              },
+              "lineHeight": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "name",
+              "fontFamily"
+            ]
+          },
+          "default": [
+            {
+              "name": "Markup (monospace)",
+              "description": "aligned tags; Devanagari falls back to a system font",
+              "fontFamily": "'JetBrains Mono', 'Noto Sans Mono', 'DejaVu Sans Mono', Menlo, Consolas, 'Noto Sans Devanagari', 'Kohinoor Devanagari', 'Nirmala UI', monospace",
+              "fontSize": 15,
+              "lineHeight": 1.5
+            },
+            {
+              "name": "IAST reading",
+              "description": "proportional serif with full diacritics",
+              "fontFamily": "'Gentium Plus', 'Charis SIL', 'Brill', 'Noto Serif', 'Times New Roman', 'Noto Serif Devanagari', 'Kohinoor Devanagari', 'Nirmala UI', serif",
+              "fontSize": 17,
+              "lineHeight": 1.6
+            },
+            {
+              "name": "Devanagari",
+              "description": "larger size and line height for conjuncts and stacked vowels",
+              "fontFamily": "'Noto Serif Devanagari', 'Sanskrit Text', 'Siddhanta', 'Kohinoor Devanagari', 'Nirmala UI', 'Gentium Plus', 'Charis SIL', serif",
+              "fontSize": 20,
+              "lineHeight": 1.9
+            },
+            {
+              "name": "Tibetan",
+              "fontFamily": "'Noto Serif Tibetan', 'Jomolhari', 'Microsoft Himalaya', 'Kailasa', 'Gentium Plus', serif",
+              "fontSize": 20,
+              "lineHeight": 2
+            },
+            {
+              "name": "South Indian scripts",
+              "description": "Tamil, Telugu, Kannada, Malayalam",
+              "fontFamily": "'Gentium Plus', 'Noto Serif Tamil', 'Noto Serif Telugu', 'Noto Serif Kannada', 'Noto Serif Malayalam', 'Nirmala UI', 'Tamil Sangam MN', serif",
+              "fontSize": 18,
+              "lineHeight": 1.8
+            }
+          ]
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "esbuild src/extension.ts --bundle --platform=node --format=cjs --external:vscode --outfile=dist/extension.js --minify",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx test/footnotes.test.ts",
+    "package": "npm run typecheck && npm test && npm run build && vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "@types/vscode": "1.85",
+    "@vscode/vsce": "^4.0.0",
+    "esbuild": "^0.28.2",
+    "playwright-core": "^1.64.1",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  }
+}

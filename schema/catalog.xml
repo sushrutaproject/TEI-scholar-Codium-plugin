@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Maps the standard TEI schema URLs to the copy bundled with TEI Scholar,
+     so validation works offline and starts instantly. -->
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+  <uri name="https://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" uri="tei_all.rng"/>
+  <uri name="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" uri="tei_all.rng"/>
+  <uri name="https://tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" uri="tei_all.rng"/>
+  <uri name="http://tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" uri="tei_all.rng"/>
+  <uri name="https://www.tei-c.org/Vault/P5/current/xml/tei/custom/schema/relaxng/tei_all.rng" uri="tei_all.rng"/>
+  <system systemId="https://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" uri="tei_all.rng"/>
+  <system systemId="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" uri="tei_all.rng"/>
+  <system systemId="https://tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" uri="tei_all.rng"/>
+  <system systemId="http://tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" uri="tei_all.rng"/>
+</catalog>
