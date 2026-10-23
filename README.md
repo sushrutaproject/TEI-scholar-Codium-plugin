@@ -7,7 +7,7 @@ It runs on top of Red Hat's XML extension, which does the schema validation
 ## Install
 
 1. Install [VS Code](https://code.visualstudio.com/).
-2. In VS Code: **Extensions** view → **⋯** menu → **Install from VSIX…** → choose `tei-scholar-0.4.0.vsix`.
+2. In VS Code: **Extensions** view → **⋯** menu → **Install from VSIX…** → choose `tei-scholar-0.5.0.vsix`.
    Red Hat's *XML* extension is installed automatically (needs internet once).
 3. Open a TEI file. If it has no schema declaration you will be offered one.
 
@@ -26,7 +26,7 @@ Inserting places `<anchor xml:id="XXX-n1"/>` at the cursor, where `XXX` is the
 bottom of the window. Saving writes
 
 ```xml
-<standOff corresp="#XXX" type="Notes">
+<standOff corresp="#XXX" type="Note">
     <note xml:lang="en" target="#XXX-n1">Text of the note.</note>
 </standOff>
 ```
@@ -36,14 +36,14 @@ after `</text>` and before `</TEI>`. Further notes in the same passage become
 in a `<standOff>` removes the `<standOff>`.
 
 **Note types.** The pane's **type** list sets the `<standOff>`'s `@type`:
-*Notes*, *Emendation*, *Testimonia*, or **Custom…** (any single word, e.g.
+*Note*, *Emendation*, *Testimonia*, or **Custom…** (any single word, e.g.
 `Parallel`). Each type gets its own `<standOff>` per passage, so one verse can
-have `type="Notes"`, `type="Emendation"` and `type="Testimonia"` blocks side by
+have `type="Note"`, `type="Emendation"` and `type="Testimonia"` blocks side by
 side. All types share one `-nN` sequence, so ids never clash. Changing the type
 of a saved note moves it to the right block (creating or removing blocks as
 needed). New notes start with the type you used last. Blocks are ordered by
 passage, then by type. On screen, notes are numbered separately per type:
-¹ ² for Notes, ᵉ¹ for Emendation, ᵗ¹ for Testimonia. The list of types is in
+¹ ² for Note, ᵉ¹ for Emendation, ᵗ¹ for Testimonia. The list of types is in
 **Settings → TEI Scholar → Footnotes: Stand Off Types**.
 
 - **Deleting a footnote in the text deletes its note.** Backspace just after an
@@ -64,6 +64,10 @@ passage, then by type. On screen, notes are numbered separately per type:
   cursor just after the anchor, so you can carry on typing. `Ctrl+Alt+J` does
   the same jump in both directions from the keyboard.
 - `Ctrl+click` (or F12) on any `#pointer` jumps to its target.
+- **Notes are kept in number order** inside each `<standOff>` (`-n1`, `-n2`, … `-n10`),
+  whenever a note is added, moved to another type, or restored. For older files,
+  an out-of-order `<standOff>` is flagged in the Problems list; the light-bulb
+  quick fix, or **TEI: Sort Notes in standOff by -n Number**, sorts the whole file.
 - **TEI: Renumber Footnotes in Reading Order** fixes ids after you insert a note
   before an existing one (e.g. `-n2` before `-n1`).
 - To always use the line group's id even when `<l>` has its own, set
