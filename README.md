@@ -7,9 +7,10 @@ It runs on top of Red Hat's XML extension, which does the schema validation
 ## Install
 
 1. Install [VS Code](https://code.visualstudio.com/).
-2. In VS Code: **Extensions** view → **⋯** menu → **Install from VSIX…** → choose `tei-scholar-0.5.0.vsix`.
+2. Fetch the most recent *.vsix file from the [TEI-scholar-Codium-plugin GitHub page](https://github.com/sushrutaproject/TEI-scholar-Codium-plugin).
+3. In VS Code: **Extensions** view → **⋯** menu → **Install from VSIX…** → choose `tei-scholar-0.5.0.vsix`.
    Red Hat's *XML* extension is installed automatically (needs internet once).
-3. Open a TEI file. If it has no schema declaration you will be offered one.
+4. Open a TEI file. If it has no schema declaration you will be offered one.
 
 ## Footnotes
 
