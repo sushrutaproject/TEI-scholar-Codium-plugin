@@ -1,4 +1,4 @@
-# TEI Scholar
+# TEI Sanskrit Scholar Codium Plugin
 
 A VS Code extension for editing TEI P5 texts, built for Indological work especially with Sanskrit manuscript transcriptions.
 The collation program suite [Saktumiva](https://chchch.github.io/saktumiva/docs/) allows footnotes to the apparatus that are encoded
