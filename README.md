@@ -1,7 +1,11 @@
 # TEI Scholar
 
-A VS Code extension for editing TEI P5 texts, built for Indological work.
-It runs on top of Red Hat's XML extension, which does the schema validation
+A VS Code extension for editing TEI P5 texts, built for Indological work especially with Sanskrit manuscript transcriptions.
+The collation program suite [Saktumiva](https://chchch.github.io/saktumiva/docs/) allows footnotes to the apparatus that are encoded
+as `<standOff>` elements at the end of the file.  This plugin takes care of the bookkeeping of such notes, allowing the user to enter
+them like ordinary word-processor footnotes.  It also supports some font choices and easy contextual reference to the TEI Guidelines. 
+
+This plugin runs on top of Red Hat's XML extension, which does the schema validation
 (with Jing, the same validator oXygen uses).
 
 ## Install
