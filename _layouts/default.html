@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="{{ page.lang | default: site.lang | default: 'en' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% seo %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Serif+Devanagari:wght@400;500&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+  <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+</head>
+<body>
+  {%- comment -%} The Suśruta Project header and menu, as on sushrutaproject.github.io {%- endcomment -%}
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="The Suśruta Project">
+      <a class="brand" href="https://sushrutaproject.github.io/">
+        <span class="brand-mark" lang="sa" aria-hidden="true">सु</span>
+        <span class="brand-name">The Suśruta Project</span>
+      </a>
+      <ul class="nav-links">
+        {%- for item in site.project_nav %}
+        <li><a href="{{ item.url }}">{{ item.title }}</a></li>
+        {%- endfor %}
+      </ul>
+    </nav>
+  </header>
+
+  {%- comment -%} This tool's own name and links {%- endcomment -%}
+  <div class="band">
+    <nav class="toolbar wrap" aria-label="{{ site.title }}">
+      <a class="tool-name" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+      <ul class="tool-links">
+        {%- for item in site.tool_nav %}
+        {%- if item.url contains '://' %}{% assign href = item.url %}{% else %}{% assign href = item.url | relative_url %}{% endif %}
+        <li><a href="{{ href }}"{% if item.url == page.url %} aria-current="page"{% endif %}>{{ item.title }}</a></li>
+        {%- endfor %}
+      </ul>
+    </nav>
+  </div>
+
+  <main id="content" class="wrap">
+    <article class="prose">
+      {{ content }}
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="footer-label">{{ site.title }}</p>
+        <p>Source code and releases:
+          <a href="https://github.com/{{ site.repo }}">github.com/{{ site.repo }}</a>.
+          {{ site.licence }}</p>
+      </div>
+      <div>
+        <p class="footer-label">The Suśruta Project</p>
+        <p>Part of the <a href="https://sushrutaproject.github.io/">Suśruta Project</a>,
+          a translation and critical edition of the <i>Suśrutasaṃhitā</i>.
+          Published with <a href="https://pages.github.com">GitHub Pages</a>.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
