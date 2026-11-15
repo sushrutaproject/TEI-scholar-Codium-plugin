@@ -1,0 +1,52 @@
+# GitHub Pages settings for sushrutaproject.github.io/TEI-scholar-Codium-plugin
+# The web page is README.md, shown with _layouts/default.html and
+# assets/css/site.css in the style of the Suśruta Project websites.
+title: TEI Sanskrit Scholar Codium Plugin
+description: A VS Code extension for editing TEI P5 texts, built for Indological work with Sanskrit manuscript transcriptions
+lang: en
+repo: sushrutaproject/TEI-scholar-Codium-plugin
+licence: "Released under the MIT licence."
+
+plugins:
+  - jekyll-seo-tag
+
+# The shared Suśruta Project menu (as in sushrutaproject.github.io/_data/navigation.yml)
+project_nav:
+  - title: Home
+    url: https://sushrutaproject.github.io/
+  - title: Translation
+    url: https://github.com/sushrutaproject1/Sushrutasamhita_Saktumiva1/raw/main/translation/incremental_SS_Translation.pdf?raw=true
+  - title: Edition
+    url: https://sushrutaproject1.github.io/Sushrutasamhita_Saktumiva2/
+  - title: Project 1
+    url: https://sushrutaproject1.github.io/
+  - title: Project 2
+    url: https://sushrutaproject2.github.io/
+  - title: Blog
+    url: https://sushrutaproject2.github.io/blog/
+
+# This plugin's own links
+tool_nav:
+  - title: Overview
+    url: /
+  - title: Install
+    url: /#install
+  - title: Changes
+    url: /CHANGELOG.html
+  - title: GitHub
+    url: https://github.com/sushrutaproject/TEI-scholar-Codium-plugin
+
+# Program sources: not part of the website
+exclude:
+  - src
+  - test
+  - tools
+  - data
+  - schema
+  - node_modules
+  - package.json
+  - package-lock.json
+  - tsconfig.json
+  - "*.vsix"
+  - "*.zip"
+  - LICENSE
